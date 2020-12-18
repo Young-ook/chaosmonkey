@@ -1,0 +1,17 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - $(aws ecr get-login --no-include-email)
+#      - TAG="$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | head -c 8)"
+      - TAG="latest"
+      - IMAGE_URI="${REPOSITORY_URI}:${TAG}"
+  build:
+    commands:
+      - docker build -t "$IMAGE_URI" .
+  post_build:
+    commands:
+      - docker push "$IMAGE_URI"
+#      - sed -i 's@CONTAINER_IMAGE@'"$REPOSITORY_URI:$TAG"'@' chaosmonkey.yaml
+#      - aws cp chaosmonkey.yaml s3://spinnaker-dev-tc1-ztyny-artifact/chaosmonkey.yaml
